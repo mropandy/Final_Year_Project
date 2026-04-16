@@ -3,7 +3,9 @@ package com.example.save_city_pet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -52,7 +54,7 @@ public class MyPetAdapter extends RecyclerView.Adapter<MyPetAdapter.ViewHolder> 
         holder.titleTxt.setText(pet.getName());
         holder.infoTxt.setText(pet.getBreed() + " | " + pet.getAge() + "歲");
 
-        // 2. 長按刪除事件
+        // 2. 長按整張卡片：刪除事件
         holder.itemView.setOnLongClickListener(v -> {
             new AlertDialog.Builder(holder.itemView.getContext())
                     .setTitle("刪除寵物")
@@ -83,8 +85,25 @@ public class MyPetAdapter extends RecyclerView.Adapter<MyPetAdapter.ViewHolder> 
                     })
                     .setNegativeButton("取消", null)
                     .show();
-
             return true; // 代表長按事件已被消費
+        });
+
+        // 💡 3. 修改點擊事件：綁定在 btnPublish 上，而不是 holder.itemView
+        holder.btnPublish.setOnClickListener(v -> {
+            // 建立一個選擇分類的清單 (這裡使用你的 Firebase Category ID)
+            String[] categories = {"撿到貓咪 (01_found_cat)", "撿到狗狗 (02_found_dog)", "尋找貓咪 (03_missing_cat)", "尋找狗狗 (04_missing_dog)"};
+            String[] categoryIds = {"01_found_cat", "02_found_dog", "03_missing_cat", "04_missing_dog"};
+
+            new AlertDialog.Builder(holder.itemView.getContext())
+                    .setTitle("將「" + pet.getName() + "」發布至公開案件")
+                    .setItems(categories, (dialog, which) -> {
+                        String selectedCategoryId = categoryIds[which];
+
+                        // 執行發布到 Items
+                        publishToPublicItems(holder.itemView.getContext(), pet, selectedCategoryId);
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
         });
     }
 
@@ -96,12 +115,48 @@ public class MyPetAdapter extends RecyclerView.Adapter<MyPetAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView titleTxt, infoTxt;
         ImageView pic;
+        LinearLayout btnPublish;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             titleTxt = itemView.findViewById(R.id.petTitle);
             infoTxt = itemView.findViewById(R.id.petInfo);
             pic = itemView.findViewById(R.id.petPic);
+            btnPublish = itemView.findViewById(R.id.btnPublish); // 💡 綁定 ID
+        }
+    }
+
+    private void publishToPublicItems(android.content.Context context, MyPetDomain pet, String categoryId) {
+        // 1. 指向 Firebase 的公開 Items 節點
+        com.google.firebase.database.DatabaseReference itemsRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("Items");
+
+        // 2. 建立新案件的唯一 Key (例如 case_05)
+        String newCaseKey = itemsRef.push().getKey();
+
+        if (newCaseKey != null) {
+            // 3. 準備寫入公開庫的資料
+            java.util.HashMap<String, Object> publicPet = new java.util.HashMap<>();
+            publicPet.put("caseID", newCaseKey);
+            publicPet.put("title", pet.getName());
+            publicPet.put("breed", pet.getBreed());
+            publicPet.put("age", pet.getAge());
+            publicPet.put("categoryId", categoryId);
+            publicPet.put("picUrl", pet.getPicUrl()); // 💡 由於照片在本地，其他人換手機會看不到，稍後說明改善
+            publicPet.put("description", "這是一筆從個人手冊發布的通報。備註：" + (pet.getNotes() != null ? pet.getNotes() : "無"));
+
+            // 💡 預設填入發布者的電話
+            String currentUid = com.google.firebase.auth.FirebaseAuth.getInstance().getUid();
+            publicPet.put("phone", "待補充");
+
+            // 4. 上傳至 Firebase
+            itemsRef.child(newCaseKey).setValue(publicPet)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "已成功發布至公開平臺！", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "發布失敗：" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 }

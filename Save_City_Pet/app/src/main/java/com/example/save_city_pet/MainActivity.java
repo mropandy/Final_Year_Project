@@ -145,10 +145,12 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 初始化海報輪播區 (點擊「首頁」或清空搜尋時呼叫)
      */
+
     public void initBanner() {
-        // 顯示海報父容器，並恢復底部列表為「所有案件」
         if (layoutSlider != null) layoutSlider.setVisibility(View.VISIBLE);
-        if (initAllCaseManager != null) initAllCaseManager.loadAllCases();
+        if (initAllCaseManager != null) {
+            initAllCaseManager.loadAllCases(); // 確保回到首頁時顯示所有最新案件
+        }
 
         DatabaseReference bannerRef = FirebaseDatabase.getInstance().getReference("Banner");
         if (progressBarSlider != null) progressBarSlider.setVisibility(View.VISIBLE);

@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- 找到你原本的 viewholder_all_cases.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp"
     android:layout_marginBottom="10dp"
-    android:background="@drawable/stroke_bg">
+    android:background="@drawable/stroke_bg"
+    android:gravity="center_vertical"> <!-- 💡 確保垂直置中 -->
 
     <ImageView
         android:id="@+id/petPic"
@@ -14,11 +15,11 @@
         android:scaleType="centerCrop" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/petTitle"
@@ -35,4 +36,37 @@
             android:text="品種 | 地區"
             android:textColor="#888888" />
     </LinearLayout>
+
+    <!-- 💡 新增：最右邊的發布按鈕 -->
+    <!-- 💡 新增：最右邊的「發布」組合按鈕 -->
+    <LinearLayout
+        android:id="@+id/btnPublish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <!-- 小飛機圖示 -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_menu_send" />
+
+        <!-- 顯示「發布」文字 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="發布失蹤"
+            android:textSize="12sp"
+            android:textColor="#FF5050"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
 </LinearLayout>
