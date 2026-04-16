@@ -141,7 +141,11 @@ public class ProfileActivity extends AppCompatActivity {
                         if (petsSnapshot.exists()) {
                             for (DataSnapshot ds : petsSnapshot.getChildren()) {
                                 MyPetDomain pet = ds.getValue(MyPetDomain.class);
-                                if (pet != null) petList.add(pet);
+                                if (pet != null) {
+                                    // 💡 關鍵修正：存入 Firebase 節點的 Key (例如 mypet_01)
+                                    pet.setKey(ds.getKey());
+                                    petList.add(pet);
+                                }
                             }
                         }
                         myPetAdapter = new MyPetAdapter(petList);

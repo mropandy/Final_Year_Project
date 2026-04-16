@@ -5,6 +5,10 @@ public class MyPetDomain {
     private String breed;
     private int age;
     private String picUrl;
+    private String key; // 💡 新增：用來存放 Firebase 節點的 Key
+
+    public String getKey() { return key; }
+    public void setKey(String key) { this.key = key; }
 
     public String getName() {
         return name;
