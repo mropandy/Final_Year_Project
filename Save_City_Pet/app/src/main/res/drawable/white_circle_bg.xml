@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- 背景顏色 (使用 80% 透明度的白色) -->
+    <solid android:color="#CCFFFFFF" />
+
+    <!-- 圓形的大小 (可以根據需要調整) -->
+    <size
+        android:width="48dp"
+        android:height="48dp" />
+</shape>

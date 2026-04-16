@@ -1,0 +1,73 @@
+{
+  "Category": {
+    "00_home": {
+      "title": "首頁",
+      "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776258849/info_icon_bweb5j.png"
+    },
+    "01_found_cat": { "title": "撿到猫咪", "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776246094/cat_icon_qgja6m.png" },
+    "02_found_dog": { "title": "撿到狗狗", "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776246227/dog_icon_iebyau.png" },
+    "03_missing_cat": { "title": "尋找猫咪", "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776246094/cat_icon_qgja6m.png" },
+    "04_missing_dog": { "title": "尋找狗狗", "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776246227/dog_icon_iebyau.png" }
+  },
+  "Banner": [
+    { "url": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776256229/poster1_rkg20r.png" },
+    { "url": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776256237/poster2_dhzrze.png" }
+  ],
+  "Items": {
+    "pet_01": {
+      "title": "小花",
+      "caseID": "case_01",
+      "phone": "85259246707",
+      "categoryId": "03_missing_cat",
+      "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776256332/lost_cat_1_eyfotx.jpg",
+      "age": 3,
+      "district": "Tuen Mun",
+      "gender": "Male",
+      "breed": "Abyssinian",
+      "description": "於屯門走失"
+    },"pet_02": {
+      "title": "大黃",
+      "phone": "85222222222",
+      "caseID": "case_02",
+      "categoryId": "02_found_dog",
+      "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776263954/lost_dog_1_zojnay.jpg",
+      "age": 2,
+      "district": "Yuen Long",
+      "gender": "Male",
+      "breed": "Golden Retriever",
+      "description": "性格溫順，在元朗公園附近發現，身上帶有藍色項圈。",
+      "status": "撿到"
+    },
+    "pet_03": {
+      "title": "Snowball",
+      "phone": "85233333333",
+      "caseID": "case_03",
+      "categoryId": "02_found_dog",
+      "picUrl": "https://res.cloudinary.com/dmjxt60yw/image/upload/q_auto/f_auto/v1776264079/found_dog_1_ak4rsi.jpg",
+      "age": 1,
+      "district": "Shatin",
+      "gender": "Female",
+      "breed": "Samoyed",
+      "description": "在沙田運動場附近發現，非常親人，暫時由我照顧。"
+    }
+  },
+  "Users": {
+    "xzMyJ7jNlRV31Qurk46tCAISfiW2": {
+      "username": "MeMes Lee",
+      "phone": "85211111111",
+      "myPets": {
+        "mypet_01": {
+          "name": "多比",
+          "breed": "Welsh Corgi",
+          "age": 2,
+          "picUrl": "/data/user/0/com.example.save_city_pet/files/my_pets/pet_1776286315067.jpg",
+          "notes": "這是我的私人寵物，別人看不到"
+        }
+      }
+    },
+    "kjofM1zN8QfW1wuDUHSxCGbWWg33": {
+      "username": "IVE (TM)",
+      "phone": "85259246707"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701750932293",
+    "project_id": "scpfyp1",
+    "storage_bucket": "scpfyp1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701750932293:android:e2e3eec4a35562d8bc842c",
+        "android_client_info": {
+          "package_name": "com.example.save_city_pet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyNAoQzjWfqgjimTsRuGOAx1qPlTGIcQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

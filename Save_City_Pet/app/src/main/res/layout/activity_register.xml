@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- 1. 頂部區域：放置左上角按鈕 -->
+
+    <!-- 2. 中間區域：註冊表單 -->
+    <ImageButton
+        android:id="@+id/btnArrow"
+        android:layout_width="@dimen/back_button_size"
+        android:layout_height="@dimen/back_button_size"
+        android:layout_gravity="start"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="返回"
+        android:padding="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrow_back" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="註冊新帳號"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="40dp" />
+
+        <EditText
+            android:id="@+id/regEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="電子郵件 (Email)"
+            android:inputType="textEmailAddress"
+            android:paddingStart="10dp"
+            android:background="@android:drawable/editbox_background" />
+
+        <EditText
+            android:id="@+id/regPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="密碼 (至少6位數)"
+            android:inputType="textPassword"
+            android:layout_marginTop="15dp"
+            android:paddingStart="10dp"
+            android:background="@android:drawable/editbox_background" />
+
+        <Button
+            android:id="@+id/btnDoRegister"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="立即註冊"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2196F3"
+            android:layout_marginTop="30dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
