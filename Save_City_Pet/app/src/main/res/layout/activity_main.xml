@@ -8,16 +8,21 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
+    <!-- 1. ScrollView 必須要與四周約束 (Constraints) -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 1. Header Area -->
+            <!-- 用戶資訊區 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,14 +67,35 @@
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/camera_icon" />
 
-                <ImageView
-                    android:id="@+id/imgBell"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/bell_icon" />
+                <LinearLayout
+                    android:id="@+id/layoutReport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:id="@+id/imgbell"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/bell_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="報告失蹤"
+                        android:textColor="#FF9800"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- 2. Search Bar Area -->
+            <!-- 搜尋欄 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,7 +128,7 @@
                     android:src="@drawable/setting_icon" />
             </LinearLayout>
 
-            <!-- 3. Category Section -->
+            <!-- 分類標題 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,6 +139,7 @@
                 android:layout_marginTop="24dp"
                 android:paddingHorizontal="24dp"/>
 
+            <!-- 分類選單 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,19 +151,21 @@
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:paddingHorizontal="20dp"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <ProgressBar
                     android:id="@+id/progressBarCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/categoryView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/categoryView"
+                    app:layout_constraintStart_toStartOf="@id/categoryView"
                     app:layout_constraintTop_toTopOf="@id/categoryView" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- 4. Slider/Banner Section (把 ViewPager2 帶回來) -->
+            <!-- 輪播圖 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutSlider"
                 android:layout_width="match_parent"
@@ -159,7 +188,7 @@
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- 5. All Cases Section (另外放下面) -->
+            <!-- 新案件標題 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,24 +197,47 @@
                 android:textSize="18sp"
                 android:textColor="@color/black"
                 android:layout_marginTop="24dp"
-                android:paddingHorizontal="24dp"/>
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="12dp"/> <!-- 加上 Margin 確保底部有留白 -->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/allCasesView"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:clipToPadding="false"
-                android:paddingHorizontal="24dp" />
+                android:layout_height="wrap_content">
 
-            <ProgressBar
-                android:id="@+id/progressBarAllCases"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/allCasesView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <ProgressBar
+                    android:id="@+id/progressBarAllCases"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@id/allCasesView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/allCasesView" />
+                <!-- 💡 貼在 activity_main.xml 的 allCasesView 附近 -->
+                <TextView
+                    android:id="@+id/tvNoResults"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍 找不到相關的寵物案件"
+                    android:textSize="16sp"
+                    android:textColor="#888888"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/allCasesView"
+                    app:layout_constraintEnd_toEndOf="@id/allCasesView"
+                    app:layout_constraintStart_toStartOf="@id/allCasesView"
+                    app:layout_constraintTop_toTopOf="@id/allCasesView" />
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

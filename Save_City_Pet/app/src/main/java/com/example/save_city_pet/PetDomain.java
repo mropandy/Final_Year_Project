@@ -99,5 +99,9 @@ public class PetDomain implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+    @Override
+    public String toString() {
+        return "PetDomain{" + "title='" + title + '\'' + ", caseID='" + caseID + '\'' + '}';
+    }
 }
 

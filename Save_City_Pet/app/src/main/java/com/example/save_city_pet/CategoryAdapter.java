@@ -14,9 +14,17 @@ import java.util.ArrayList;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     private ArrayList<CategoryDomain> items;
+    private OnCategoryClickListener listener; // 💡 1. 新增點擊監聽介面
 
-    public CategoryAdapter(ArrayList<CategoryDomain> items) {
+    // 💡 2. 定義介面，供 MainActivity 實作
+    public interface OnCategoryClickListener {
+        void onCategoryClick(CategoryDomain item);
+    }
+
+    // 💡 3. 修改構造函數，傳入監聽器
+    public CategoryAdapter(ArrayList<CategoryDomain> items, OnCategoryClickListener listener) {
         this.items = items;
+        this.listener = listener;
     }
 
     @NonNull
@@ -31,37 +39,27 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         CategoryDomain item = items.get(position);
         holder.titleTxt.setText(item.getTitle());
 
-        // 關鍵修正：使用 Glide 載入 JSON 裡的 picUrl 網址
+        // 使用 Glide 載入
         Glide.with(holder.itemView.getContext())
                 .load(item.getPicUrl())
-                .placeholder(R.drawable.profile) // 載入中顯示
-                .error(R.drawable.profile)       // 失敗顯示
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
                 .into(holder.pic);
 
-        // 點擊事件保持不變
+        // 💡 4. 使用介面處理點擊事件，避免強制轉型
         holder.itemView.setOnClickListener(v -> {
-            if (holder.itemView.getContext() instanceof MainActivity) {
-                MainActivity activity = (MainActivity) holder.itemView.getContext();
-
-                // 判斷 ID 是否為 00_home
-                if (item.getId().equals("00_home")) {
-                    activity.initBanner(); // 回到海報
-                } else {
-                    activity.loadPetsByCategory(item.getId()); // 載入寵物
-                }
+            if (listener != null) {
+                listener.onCategoryClick(item);
             }
         });
     }
-
-
-
 
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder { // 💡 加上 static 減少記憶體佔用
         TextView titleTxt;
         ImageView pic;
 

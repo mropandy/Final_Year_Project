@@ -27,17 +27,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private FirebaseAuth mAuth;
     private TextView tvUserName;
-
     private RecyclerView recyclerViewCategory;
     private RecyclerView.Adapter adapterCategory;
     private ProgressBar progressBar, progressBarSlider;
-
     private InitAllCase initAllCaseManager;
     private SearchManager searchManager;
-
     private DatabaseReference database;
     private ViewPager2 viewPagerSlider;
     private View layoutSlider; // 包裹 ViewPager2 的父容器
@@ -48,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. 綁定 UI 元件
         mAuth = FirebaseAuth.getInstance();
         tvUserName = findViewById(R.id.tvUserName);
         recyclerViewCategory = findViewById(R.id.categoryView);
@@ -60,47 +55,47 @@ public class MainActivity extends AppCompatActivity {
         EditText editTextSearch = findViewById(R.id.editTextSearch);
         ImageView imgProfile = findViewById(R.id.imgProfile);
 
+        // 💡 1. 移除了重複實例化 searchManager 的程式碼
+// 在 MainActivity 的 onCreate 中，補上第三個參數（這需要您在 activity_main.xml 中放一個 TextView 顯示找不到結果）
+        searchManager = new SearchManager(
+                findViewById(R.id.allCasesView),
+                findViewById(R.id.progressBarAllCases),
+                findViewById(R.id.tvNoResults) // 💡 補上這個用於提示找不到的 TextView
+        );
 
 
-        // 2. 顯示用戶資訊
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             tvUserName.setText(currentUser.getEmail());
         }
 
-        // 3. 初始化各類管理器 (傳入對應元件)
-        // 在 MainActivity 的 onCreate 裡面修改這一行
-        searchManager = new SearchManager(findViewById(R.id.allCasesView), findViewById(R.id.progressBarAllCases));
+        // 初始化各類管理器
         initAllCaseManager = new InitAllCase(findViewById(R.id.allCasesView), findViewById(R.id.progressBarAllCases));
 
-        // 4. 執行初始載入資料
         initCategories(); // 載入橫向分類
         initBanner();     // 載入海報
         initAllCaseManager.loadAllCases(); // 載入底部所有案件
 
-        // 5. 搜尋框監聽
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
                 if (!query.isEmpty()) {
-                    // 搜尋時隱藏海報區，讓結果更清楚
                     if (layoutSlider != null) layoutSlider.setVisibility(View.GONE);
                     searchManager.search(query);
                 } else {
-                    // 清空搜尋則恢復海報
-                    initBanner();
+                    if (layoutSlider != null) layoutSlider.setVisibility(View.VISIBLE);
+                    if (initAllCaseManager != null) {
+                        initAllCaseManager.loadAllCases();
+                    }
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        // 6. 設定按鈕點擊
         imgSettings.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
         });
@@ -108,11 +103,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
+        findViewById(R.id.layoutReport).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ReportActivity.class);
+            startActivity(intent);
+        });
     }
 
-    /**
-     * 載入中間橫向的分類按鈕
-     */
     private void initCategories() {
         recyclerViewCategory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         database = FirebaseDatabase.getInstance().getReference("Category");
@@ -130,7 +126,17 @@ public class MainActivity extends AppCompatActivity {
                             list.add(domain);
                         }
                     }
-                    adapterCategory = new CategoryAdapter(list);
+
+                    // 💡 2. 修正建構子：將點擊介面對接至 MainActivity 的方法
+                    adapterCategory = new CategoryAdapter(list, item -> {
+                        // 💡 安全的字串比對，防範 null
+                        if ("00_home".equals(item.getId())) {
+                            initBanner();
+                        } else {
+                            loadPetsByCategory(item.getId());
+                        }
+                    });
+
                     recyclerViewCategory.setAdapter(adapterCategory);
                     progressBar.setVisibility(View.GONE);
                 }
@@ -142,19 +148,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 初始化海報輪播區 (點擊「首頁」或清空搜尋時呼叫)
-     */
-
     public void initBanner() {
         if (layoutSlider != null) layoutSlider.setVisibility(View.VISIBLE);
         if (initAllCaseManager != null) {
             initAllCaseManager.loadAllCases(); // 確保回到首頁時顯示所有最新案件
         }
-
         DatabaseReference bannerRef = FirebaseDatabase.getInstance().getReference("Banner");
         if (progressBarSlider != null) progressBarSlider.setVisibility(View.VISIBLE);
 
+        // 💡 3. addListenerForSingleValueEvent 是正確的，廣告海報不需要實時監聽，讀一次即可！
         bannerRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -181,16 +183,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 點擊特定分類時呼叫 (隱藏海報區，並連動底部列表過濾資料)
-     */
     public void loadPetsByCategory(String categoryId) {
-        // 隱藏整個海報父容器，消除空格
         if (layoutSlider != null) {
             layoutSlider.setVisibility(View.GONE);
         }
-
-        // 叫底部列表經理只載入該分類的數據
         if (initAllCaseManager != null) {
             initAllCaseManager.loadCasesByCategory(categoryId);
         }

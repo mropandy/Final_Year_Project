@@ -5,13 +5,11 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
 public class InitAllCase {
@@ -24,7 +22,6 @@ public class InitAllCase {
         this.progressBar = progressBar;
         this.databaseReference = FirebaseDatabase.getInstance().getReference("Items");
     }
-
     public void loadAllCases() {
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
@@ -40,11 +37,12 @@ public class InitAllCase {
                     for (DataSnapshot issue : snapshot.getChildren()) {
                         PetDomain pet = issue.getValue(PetDomain.class);
                         if (pet != null) {
-                            pet.setCaseID(issue.getKey()); // 存入私有鍵
+                            pet.setCaseID(issue.getKey()); // 存入 Firebase 節點的 Key
                             list.add(pet);
                         }
                     }
                     if (list.size() > 0) {
+                        // 💡 修正：首頁使用 PetListAdapter 載入公開清單，不會出現小飛機按鈕
                         recyclerView.setAdapter(new PetListAdapter(list));
                     }
                 }
@@ -57,11 +55,10 @@ public class InitAllCase {
             }
         });
     }
-    // 在 InitAllCase.java 裡面新增這個方法
     public void loadCasesByCategory(String categoryId) {
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
-        // 💡 關鍵：只查詢 categoryId 等於我們傳入的值
+        // 💡 只查詢 categoryId 等於我們傳入的值
         databaseReference.orderByChild("categoryId").equalTo(categoryId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -74,11 +71,10 @@ public class InitAllCase {
                                 list.add(pet);
                             }
                         }
-                        // 更新下方的 RecyclerView
+                        // 更新下方的 RecyclerView，同樣使用 PetListAdapter
                         recyclerView.setAdapter(new PetListAdapter(list));
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);

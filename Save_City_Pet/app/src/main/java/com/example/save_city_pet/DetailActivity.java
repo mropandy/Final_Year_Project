@@ -17,7 +17,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        // 💡 接收傳過來的物件
+        // 接收傳過來的物件
         PetDomain pet = (PetDomain) getIntent().getSerializableExtra("object");
 
         if (pet != null) {
@@ -29,8 +29,14 @@ public class DetailActivity extends AppCompatActivity {
             TextView tvInfo = findViewById(R.id.tvDetailInfo);
             Button btnContact = findViewById(R.id.btnContact);
 
-            // 填入基礎資料
-            tvTitle.setText(pet.getTitle() + " (" + pet.getBreed() + ")");
+            // 💡 填入基礎資料 (優化：防範當 Breed 為空時出現空括號)
+            String petBreed = pet.getBreed();
+            if (petBreed != null && !petBreed.isEmpty()) {
+                tvTitle.setText(pet.getTitle() + " (" + petBreed + ")");
+            } else {
+                tvTitle.setText(pet.getTitle());
+            }
+
             tvDesc.setText(pet.getDescription());
             tvCase.setText("ID: #" + pet.getCaseID());
 
@@ -38,17 +44,18 @@ public class DetailActivity extends AppCompatActivity {
 
             // 顯示大圖
             Glide.with(this).load(pet.getPicUrl()).into(imgPic);
+
             btnContact.setOnClickListener(v -> {
-                String phoneNumber = pet.getPhone(); // 確保 Firebase 存的是 852XXXXXXXX，不要有 + 或 -
+                String phoneNumber = pet.getPhone();
 
                 if (phoneNumber != null && !phoneNumber.isEmpty()) {
                     // 1. 定義預先填妥的訊息
                     String rawMessage = "你好，我想查詢關於案件 #" + pet.getCaseID() + " (" + pet.getTitle() + ") 的資訊。";
 
-                    // 2. 💡 關鍵：使用 Uri.encode 將中文訊息轉為 urlencodedtext
+                    // 2. 使用 Uri.encode 將中文訊息轉為 urlencodedtext
                     String urlEncodedText = android.net.Uri.encode(rawMessage);
 
-                    // 3. 按照你提供的官方格式拼接連結
+                    // 3. 按照 WhatsApp 官方格式拼接連結
                     String url = "https://wa.me/" + phoneNumber + "?text=" + urlEncodedText;
 
                     // 4. 啟動 Intent
@@ -67,8 +74,8 @@ public class DetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "無法取得聯絡電話", Toast.LENGTH_SHORT).show();
                 }
             });
-
         }
+
         // 返回按鈕
         findViewById(R.id.btnArrow).setOnClickListener(v -> finish());
     }

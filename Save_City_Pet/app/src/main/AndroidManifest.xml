@@ -27,6 +27,8 @@
             android:parentActivityName=".FirstActivity" /> <!-- 啟動頁面 -->
         <activity android:name=".DetailActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".ReportActivity" />
+
         <activity
             android:name=".FirstActivity"
             android:exported="true">

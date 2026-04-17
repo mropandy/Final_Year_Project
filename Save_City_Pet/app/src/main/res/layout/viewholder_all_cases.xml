@@ -1,19 +1,24 @@
-<!-- 找到你原本的 viewholder_all_cases.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 💡 補上 ID 用於整行點擊跳轉詳細頁 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutCaseItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp"
     android:layout_marginBottom="10dp"
     android:background="@drawable/stroke_bg"
-    android:gravity="center_vertical"> <!-- 💡 確保垂直置中 -->
+    android:gravity="center_vertical">
 
+    <!-- 寵物圖片 (建議在 drawable 加個預設圖 placeholder) -->
     <ImageView
         android:id="@+id/petPic"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:contentDescription="Pet Image" />
 
+    <!-- 中間文字資訊 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -27,18 +32,19 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@android:color/black"
+            android:text="寵物名字" /> <!-- 💡 補上預設文字方便預覽 -->
 
         <TextView
             android:id="@+id/petInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="品種 | 地區"
             android:textColor="#888888" />
     </LinearLayout>
 
-    <!-- 💡 新增：最右邊的發布按鈕 -->
-    <!-- 💡 新增：最右邊的「發布」組合按鈕 -->
+    <!-- 最右邊的「發布」組合按鈕 -->
     <LinearLayout
         android:id="@+id/btnPublish"
         android:layout_width="wrap_content"
@@ -55,7 +61,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:scaleType="fitCenter"
-            android:src="@android:drawable/ic_menu_send" />
+            android:src="@android:drawable/ic_menu_send"
+            android:contentDescription="Publish Button Icon" />
 
         <!-- 顯示「發布」文字 -->
         <TextView

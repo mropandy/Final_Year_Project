@@ -79,6 +79,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/userInfoSection"
         android:layout_above="@id/btnAddMyPet"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:clipToPadding="false" />
 
 </RelativeLayout>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Save_City_Pet</string>
+    <string name="back_button">Back Button</string>
 </resources>

@@ -2,6 +2,8 @@ package com.example.save_city_pet;
 
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,17 +18,24 @@ import java.util.ArrayList;
 public class SearchManager {
 
     private DatabaseReference itemsRef;
-    private RecyclerView recyclerView; // 💡 修正：改用 RecyclerView 來顯示列表
+    private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private TextView tvNoResults;
 
-    // 💡 修正：傳入的是底部的 RecyclerView，而不是 ViewPager2
-    public SearchManager(RecyclerView recyclerView, ProgressBar progressBar) {
+    // 💡 1. 修正建構子：傳入 3 個參數，正確接收 tvNoResults
+    public SearchManager(RecyclerView recyclerView, ProgressBar progressBar, TextView tvNoResults) {
         this.recyclerView = recyclerView;
         this.progressBar = progressBar;
+        this.tvNoResults = tvNoResults; // 💡 修正自我賦值錯誤
         this.itemsRef = FirebaseDatabase.getInstance().getReference("Items");
     }
 
     public void search(String query) {
+        // 💡 2. 安全防護：如果搜尋字串為空，直接不處理
+        if (query == null || query.trim().isEmpty()) {
+            return;
+        }
+
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
         itemsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -39,9 +48,9 @@ public class SearchManager {
                     PetDomain pet = ds.getValue(PetDomain.class);
 
                     if (pet != null) {
-                        pet.setCaseID(ds.getKey()); // 💡 確保存入 CaseID，方便點擊看詳情
+                        pet.setCaseID(ds.getKey());
 
-                        // 🔍 合理化搜尋條件：同時進行 null 安全檢查
+                        // 🔍 null 安全檢查
                         boolean matchesName = pet.getTitle() != null && pet.getTitle().toLowerCase().contains(lowerQuery);
                         boolean matchesBreed = pet.getBreed() != null && pet.getBreed().toLowerCase().contains(lowerQuery);
 
@@ -51,11 +60,22 @@ public class SearchManager {
                     }
                 }
 
-                // 💡 關鍵：直接將搜尋過濾後的結果，塞給底部的 PetListAdapter
+                // 💡 3. 處理搜尋結果
                 if (resultList.isEmpty()) {
-                    // 如果找不到資料，可以塞一個空的 List (畫面會顯示空白)
+                    // 為了確保畫面清空，先給空 Adapter
                     recyclerView.setAdapter(new PetListAdapter(new ArrayList<>()));
+
+                    // 🎯 找不到資料：隱藏列表，顯示提示
+                    recyclerView.setVisibility(View.GONE);
+                    if (tvNoResults != null) {
+                        tvNoResults.setVisibility(View.VISIBLE);
+                        tvNoResults.bringToFront(); // 確保它在最上層
+                    }
                 } else {
+                    // 🎯 找到資料：隱藏提示，顯示列表
+                    if (tvNoResults != null) tvNoResults.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+
                     recyclerView.setAdapter(new PetListAdapter(resultList));
                 }
 

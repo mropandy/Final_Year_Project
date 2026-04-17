@@ -29,14 +29,14 @@
             android:orientation="vertical">
 
             <!-- 寵物大圖 -->
+
+            <!-- 文字資訊區 (這裡保留你原本的 TextView 們) -->
             <ImageView
                 android:id="@+id/detailPic"
                 android:layout_width="match_parent"
-
                 android:layout_height="350dp"
                 android:scaleType="centerCrop" />
 
-            <!-- 文字資訊區 (這裡保留你原本的 TextView 們) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,14 +1,32 @@
 package com.example.save_city_pet;
 
-public class MyPetDomain {
-    private String name;  // 💡 注意這裡跟 Items 不同，JSON 是 name
+import java.io.Serializable;
+
+// 💡 1. 加上 implements Serializable，確保物件能透過 Intent 安全傳遞
+public class MyPetDomain implements Serializable {
+
+    // 💡 2. 將所有變數統一放在最上方，方便閱讀與管理
+    private String id;      // 預防未來擴充使用
+    private String name;    // 💡 注意：與 Items 的 title 不同，對應 JSON 內的 name
     private String breed;
     private int age;
-    private String picUrl;
-    private String key; // 💡 新增：用來存放 Firebase 節點的 Key
+    private String picUrl;  // 存放本地路徑
+    private String notes;   // 備註
+    private String key;     // 💡 存放 Firebase 節點的 Key
 
-    public String getKey() { return key; }
-    public void setKey(String key) { this.key = key; }
+    // Firebase 必需的空建構子
+    public MyPetDomain() {
+    }
+
+    // --- Getter 和 Setter 區塊 ---
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public String getName() {
         return name;
@@ -49,10 +67,4 @@ public class MyPetDomain {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-    private String notes;
-
-    public MyPetDomain() {}
-    // Getters and Setters...
 }
-

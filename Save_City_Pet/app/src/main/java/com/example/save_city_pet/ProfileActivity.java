@@ -3,14 +3,15 @@ package com.example.save_city_pet;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -23,6 +24,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -31,12 +37,20 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private RecyclerView myPetRecyclerView;
     private MyPetAdapter myPetAdapter;
+    private ImageView profileImageLarge;
 
-    // 💡 確保使用同一個變數名
     private Uri imageUri;
     private PetUploadManager uploadManager;
 
-    // 💡 註冊選圖 Launcher
+    // 💡 1. PickVisualMedia 必須宣告在全域，不能寫在 onCreate 裡面
+    private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+            registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                if (uri != null) {
+                    saveImageToLocal(uri);
+                }
+            });
+
+    // 💡 2. 選圖 Launcher
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -51,7 +65,8 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // 1. 綁定 UI
+        // 💡 3. 修正：必須先綁定，再呼叫 loadLocalProfileImage()，否則會閃退！
+        profileImageLarge = findViewById(R.id.profileImageLarge);
         tvName = findViewById(R.id.profileName);
         tvPhone = findViewById(R.id.profilePhone);
         tvEmail = findViewById(R.id.profileEmail);
@@ -59,7 +74,8 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnArrow);
         myPetRecyclerView = findViewById(R.id.myPetRecyclerView);
 
-        // 💡 初始化上傳管理器
+        loadLocalProfileImage();
+
         uploadManager = new PetUploadManager(this);
 
         findViewById(R.id.btnAddMyPet).setOnClickListener(v -> showAddPetDialog());
@@ -67,6 +83,46 @@ public class ProfileActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         loadUserProfile();
+
+        profileImageLarge.setOnClickListener(v -> {
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        });
+    }
+
+    private void saveImageToLocal(Uri sourceUri) {
+        // 💡 使用 try-with-resources 安全讀寫，防範記憶體流失
+        File directory = getFilesDir();
+        File file = new File(directory, "profile_avatar.jpg");
+
+        try (InputStream inputStream = getContentResolver().openInputStream(sourceUri);
+             FileOutputStream outputStream = new FileOutputStream(file)) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            profileImageLarge.setImageURI(Uri.fromFile(file));
+            Toast.makeText(this, "大頭貼已儲存在本地！", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "儲存失敗：" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadLocalProfileImage() {
+        File directory = getFilesDir();
+        File file = new File(directory, "profile_avatar.jpg");
+
+        if (file.exists()) {
+            profileImageLarge.setImageURI(Uri.fromFile(file));
+        } else {
+            profileImageLarge.setImageResource(R.drawable.profile);
+        }
     }
 
     private void showAddPetDialog() {
@@ -90,7 +146,6 @@ public class ProfileActivity extends AppCompatActivity {
         inputAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(inputAge);
 
-        // 💡 增加選取照片按鈕
         final Button btnPick = new Button(this);
         btnPick.setText("選取寵物照片");
         btnPick.setOnClickListener(v -> openGallery());
@@ -104,7 +159,6 @@ public class ProfileActivity extends AppCompatActivity {
             String ageStr = inputAge.getText().toString();
             int age = ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr);
 
-            // 💡 呼叫新的上傳方法
             if (imageUri != null) {
                 uploadManager.savePetLocally(name, breed, age, imageUri);
                 imageUri = null; // 上傳後重置
@@ -138,22 +192,28 @@ public class ProfileActivity extends AppCompatActivity {
 
                         ArrayList<MyPetDomain> petList = new ArrayList<>();
                         DataSnapshot petsSnapshot = snapshot.child("myPets");
+
+                        // 💡 4. 為您補齊被截斷的 Firebase 迴圈結尾
                         if (petsSnapshot.exists()) {
                             for (DataSnapshot ds : petsSnapshot.getChildren()) {
                                 MyPetDomain pet = ds.getValue(MyPetDomain.class);
                                 if (pet != null) {
-                                    // 💡 關鍵修正：存入 Firebase 節點的 Key (例如 mypet_01)
                                     pet.setKey(ds.getKey());
                                     petList.add(pet);
                                 }
                             }
                         }
-                        myPetAdapter = new MyPetAdapter(petList);
+
+                        // 💡 5. 初始化並設定 Adapter (第二個參數 true 代表在個人頁，要顯示發布按鈕)
+                        myPetAdapter = new MyPetAdapter(petList, true);
                         myPetRecyclerView.setAdapter(myPetAdapter);
                     }
                 }
+
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(ProfileActivity.this, "讀取失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }

@@ -1,6 +1,8 @@
 package com.example.save_city_pet;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,30 +23,34 @@ public class PetUploadManager {
         String uid = FirebaseAuth.getInstance().getUid();
         if (uid == null || imageUri == null) return;
 
-        try {
-            // 1. 在手機建立專屬資料夾 (私有目錄)
+        // 💡 1. 使用 try-with-resources 自動關閉流，防範異常時內存洩漏
+        try (InputStream is = context.getContentResolver().openInputStream(imageUri)) {
+
+            // 在手機建立專屬資料夾 (私有目錄)
             File folder = new File(context.getFilesDir(), "my_pets");
             if (!folder.exists()) folder.mkdirs();
 
-            // 2. 建立唯一的檔案名稱
+            // 建立唯一的檔案名稱
             String fileName = "pet_" + System.currentTimeMillis() + ".jpg";
             File localFile = new File(folder, fileName);
 
-            // 3. 將選取的圖片複製到私有資料夾
-            InputStream is = context.getContentResolver().openInputStream(imageUri);
-            FileOutputStream fos = new FileOutputStream(localFile);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, read);
+            // 💡 2. 進行圖片壓縮：防止原圖過大導致未來 OOM 閃退
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            if (bitmap != null) {
+                try (FileOutputStream fos = new FileOutputStream(localFile)) {
+                    // 壓縮率設為 80%，在畫質與檔案大小間取得平衡
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+                    bitmap.recycle(); // 💡 釋放 Bitmap 記憶體
+                }
+            } else {
+                Toast.makeText(context, "解析圖片失敗", Toast.LENGTH_SHORT).show();
+                return;
             }
-            fos.close();
-            is.close();
 
-            // 4. 取得本地絕對路徑
+            // 取得本地絕對路徑
             String localPath = localFile.getAbsolutePath();
 
-            // 5. 存入 Firebase
+            // 存入 Firebase
             saveToFirebase(uid, name, breed, age, localPath);
 
         } catch (Exception e) {

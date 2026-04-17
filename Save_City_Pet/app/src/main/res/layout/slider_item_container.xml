@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
+    <!-- 寵物輪播大圖 -->
     <ImageView
         android:id="@+id/imageSlider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
+        android:contentDescription="Pet Image Slider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <!-- 在原本的 ImageView 下方加入這個 LinearLayout -->
+
+    <!-- 💡 半透明文字遮罩區 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:background="#80000000"
+        android:padding="16dp"
+        android:background="#90000000"
+        android:layout_marginBottom="16dp"
+        android:layout_marginHorizontal="12dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- 💡 使用 @android:color/white 避免 white 資源未定義報錯 -->
         <TextView
             android:id="@+id/petInfoTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="18sp"
             android:text="小花 (Abyssinian)" />
@@ -34,8 +41,10 @@
             android:id="@+id/petInfoDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:layout_marginTop="4dp"
+            android:textColor="@android:color/white"
             android:textSize="14sp"
             android:text="Age: 3 | Gender: Male | Location: Tuen Mun" />
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

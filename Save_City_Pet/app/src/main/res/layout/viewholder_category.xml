@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutCategoryItem"
     android:layout_width="100dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/stroke_bg"
     android:layout_margin="8dp"
-    android:padding="8dp"
-    android:gravity="center">
+    android:padding="12dp"
+    android:gravity="center"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"> <!-- 💡 加上這行，點擊時卡片會有波紋效果 -->
 
     <ImageView
         android:id="@+id/categoryPic"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/profile" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/profile"
+        android:contentDescription="Category Icon" />
 
     <TextView
         android:id="@+id/categoryName"
@@ -20,6 +26,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Title"
-        android:textColor="@color/black"
-        android:textSize="12sp" />
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="1" /> <!-- 💡 限制單行，若文字太長會顯示為... 防止破壞佈局 -->
+
 </LinearLayout>
