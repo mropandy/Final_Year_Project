@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
-    <!-- 1. 頂部返回與標題 -->
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -33,8 +32,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>
-
-    <!-- 💡 2. 底部送出按鈕 (先寫在這裡，確保 ScrollView 能夠 layout_above 它) -->
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
@@ -47,7 +44,6 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <!-- 3. 滾動表單 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -82,6 +78,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="案件類型 *"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/spinnerCategory"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/stroke_bg" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="寵物名字"
                 android:textColor="@android:color/black"
@@ -96,6 +107,22 @@
                 android:hint="可不輸入寵物名字"
                 android:paddingHorizontal="12dp"
                 android:inputType="text" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="年齡 (歲) *"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/etPetAge"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/stroke_bg"
+                android:hint="輸入數字 (例如: 3)"
+                android:inputType="number"
+                android:paddingHorizontal="12dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -119,11 +146,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:text="性別 *"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/rgPetGender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="公 (Male)"
+                    android:layout_marginEnd="20dp" />
+
+                <RadioButton
+                    android:id="@+id/rbFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="母 (Female)" />
+            </RadioGroup>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="失蹤地區 *"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
-            <!-- 💡 修正了 TextInputLayout 與 AutoCompleteTextView 的高度與樣式 -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPetDistrict"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -149,16 +205,29 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/etPetPhone"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/stroke_bg"
-                android:hint="請輸入 85211111111"
-                android:inputType="phone"
-                android:paddingHorizontal="12dp" />
+                android:orientation="horizontal">
 
+                <Spinner
+                    android:id="@+id/spinnerPhoneCode"
+                    android:layout_width="100dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/stroke_bg" />
+
+                <EditText
+                    android:id="@+id/etPetPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/stroke_bg"
+                    android:hint="例如: 51234567"
+                    android:inputType="phone"
+                    android:paddingHorizontal="12dp" />
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,7 +235,6 @@
                 android:text="詳細描述"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
-
             <EditText
                 android:id="@+id/etPetDesc"
                 android:layout_width="match_parent"
@@ -179,5 +247,4 @@
                 android:inputType="textMultiLine" />
         </LinearLayout>
     </ScrollView>
-
 </RelativeLayout>

@@ -1,28 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://android.com"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@android:color/white"
     android:gravity="center"
-    android:padding="30dp">
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <!-- 品牌圖示 (移除 tint，顯示原始紅色圖標) -->
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/app_icon"
+        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="歡迎來到 Save City Pet"
-        android:textSize="24sp"
-        android:layout_marginBottom="50dp" /> <!-- 修正這裡 -->
+        android:text="Save City Pet"
+        android:textColor="#E53935"
+        android:textSize="32sp"
+        android:textStyle="bold" />
 
-    <Button
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="守護流浪毛孩，為牠們找個家"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        android:layout_marginBottom="60dp" />
+
+    <!-- 登入按鈕 (紅底白字) -->
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnGoLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我要登入" /> <!-- 修正這裡 -->
+        android:layout_height="55dp"
+        android:background="@drawable/red_rounded_btn"
+        android:text="登入帳號"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:elevation="2dp" />
 
-    <Button
+    <!-- 註冊按鈕 (白底紅字) -->
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnGoRegister"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="註冊新帳號"
-        android:layout_marginTop="10dp" />
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="還沒有帳號？立即註冊"
+        android:textColor="#E53935"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAllCaps="false" />
+
 </LinearLayout>
