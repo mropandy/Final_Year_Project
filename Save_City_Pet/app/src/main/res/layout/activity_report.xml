@@ -32,17 +32,18 @@
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:backgroundTint="#FF9800"
+        android:background="@drawable/red_rounded_btn"
         android:text="發布至公開案件"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold" />
+
 
     <ScrollView
         android:layout_width="match_parent"

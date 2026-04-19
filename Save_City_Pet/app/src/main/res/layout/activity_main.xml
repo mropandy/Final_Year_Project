@@ -133,7 +133,7 @@
                     android:background="@drawable/stroke_bg"
                     android:drawableStart="@drawable/search_icon"
                     android:drawablePadding="12dp"
-                    android:hint="Search pets..."
+                    android:hint=" 地區、品種或性別"
                     android:inputType="text"
                     android:paddingHorizontal="16dp" />
 
