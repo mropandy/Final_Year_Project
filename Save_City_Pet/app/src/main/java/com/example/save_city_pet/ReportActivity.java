@@ -1,5 +1,6 @@
 package com.example.save_city_pet;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,8 +15,7 @@ import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ReportActivity extends AppCompatActivity {
 
@@ -43,18 +43,13 @@ public class ReportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-
-        // 1. 初始化 Cloudinary
         try {
             Map<String, Object> config = new HashMap<>();
             config.put("cloud_name", BuildConfig.CLOUDINARY_CLOUD_NAME);
             config.put("secure", true);
             MediaManager.init(this, config);
-        } catch (Exception e) {
-            // 避免重複初始化報錯
-        }
+        } catch (Exception e) { }
 
-        // 2. 綁定 UI 元件
         imgReportPet = findViewById(R.id.imgReportPet);
         etName = findViewById(R.id.etPetName);
         etBreed = findViewById(R.id.etPetBreed);
@@ -68,14 +63,12 @@ public class ReportActivity extends AppCompatActivity {
         spinnerPhoneCode = findViewById(R.id.spinnerPhoneCode);
         etBreed = findViewById(R.id.etPetBreed);
 
-        // 3. 設定 下拉選單 (Spinner)
         ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, catTitles);
         spinnerCategory.setAdapter(catAdapter);
 
         ArrayAdapter<String> phoneAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, phoneCodes);
         spinnerPhoneCode.setAdapter(phoneAdapter);
 
-        // 4. 設定 地區自動完成
         String[] districts = new String[]{"Tuen Mun", "Sha Tin", "Mong Kok", "Kowloon City", "Central and Western" , "Wan Chai", "Yau Tsim Mong","Southern","Tai Po","Kwai Tsing","Sai Kung","Northern", "Yuen Long","Tsuen Wan","Islands","Kwun Tong","Wong Tai Sin","Sham Shui Po"};
         ArrayAdapter<String> districtAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, districts);
         etDistrict.setAdapter(districtAdapter);
@@ -95,7 +88,6 @@ public class ReportActivity extends AppCompatActivity {
             etBreed.setText(aiBreed);
             Toast.makeText(this, "已自動填入辨識品種：" + aiBreed, Toast.LENGTH_SHORT).show();
         }
-        // 5. 事件監聽
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         imgReportPet.setOnClickListener(v -> {
@@ -114,16 +106,13 @@ public class ReportActivity extends AppCompatActivity {
         String desc = etDesc.getText().toString().trim();
         String ageStr = etAge.getText().toString().trim();
 
-        // 處理電話：國碼 + 號碼
         String rawPhone = etPhone.getText().toString().trim();
         String selectedCode = spinnerPhoneCode.getSelectedItem().toString();
         String fullPhone = selectedCode + rawPhone;
 
-        // 獲取分類 ID
         int selectedCatIndex = spinnerCategory.getSelectedItemPosition();
         String categoryId = catIds[selectedCatIndex];
 
-        // 獲取性別
         int selectedGenderId = rgGender.getCheckedRadioButtonId();
         if (selectedGenderId == -1) {
             Toast.makeText(this, "請選擇性別", Toast.LENGTH_SHORT).show();
@@ -144,7 +133,6 @@ public class ReportActivity extends AppCompatActivity {
 
         int age = Integer.parseInt(ageStr);
 
-        // 預先生成 Firebase Key
         DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("Items");
         String newCaseKey = itemsRef.push().getKey();
 
@@ -154,7 +142,6 @@ public class ReportActivity extends AppCompatActivity {
         btnSubmit.setEnabled(false);
         Toast.makeText(this, "正在發布案件...", Toast.LENGTH_SHORT).show();
 
-        // 上傳圖片到 Cloudinary
         MediaManager.get().upload(selectedImageUri)
                 .unsigned("save_city_pet_presetName") // 💡 確保此 Preset Name 正確
                 .callback(new UploadCallback() {
@@ -197,12 +184,49 @@ public class ReportActivity extends AppCompatActivity {
             publicPet.put("age", age);
 
             itemsRef.child(newCaseKey).setValue(publicPet).addOnSuccessListener(aVoid -> {
+                if (isFinishing() || isDestroyed()) return;
+
                 Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show();
-                finish();
-            }).addOnFailureListener(e -> {
-                btnSubmit.setEnabled(true);
-                Toast.makeText(this, "資料存儲失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("交由管理員處理？")
+                        .setMessage("您是否需要將此寵物交由 IVE (TM) 管理員接手照顧？\n\n若選擇「是」，聯絡電話將更改為管理員電話。")
+                        .setCancelable(false)
+                        .setPositiveButton("是，交給管理員", (dialog, which) -> {
+                            // 💡 2. 更新 Firebase 中的電話為 IVE (TM) 的電話
+                            String adminPhone = "85259246707";
+                            itemsRef.child(newCaseKey).child("phone").setValue(adminPhone)
+                                    .addOnSuccessListener(unused -> {
+                                        Toast.makeText(this, "已交由 IVE (TM) 接手", Toast.LENGTH_SHORT).show();
+                                        startMatchingProcess(newCaseKey, breed, district, gender, categoryId);
+                                    });
+                        })
+                        .setNegativeButton("否，我自己聯絡", (dialog, which) -> {
+                            startMatchingProcess(newCaseKey, breed, district, gender, categoryId);
+                        })
+                        .show();
+
+                PetDomain currentPet = new PetDomain();
+                currentPet.setCaseID(newCaseKey);
+                currentPet.setBreed(breed);
+                currentPet.setDistrict(district);
+                currentPet.setGender(gender);
+                currentPet.setCategoryId(categoryId);
+
+                // 💡 確保傳入正確的 Context
+                PetMatchManager matchManager = new PetMatchManager(this);
+                matchManager.findMatch(currentPet);
             });
         }
+    }
+    private void startMatchingProcess(String caseId, String breed, String district, String gender, String categoryId) {
+        PetDomain currentPet = new PetDomain();
+        currentPet.setCaseID(caseId);
+        currentPet.setBreed(breed);
+        currentPet.setDistrict(district);
+        currentPet.setGender(gender);
+        currentPet.setCategoryId(categoryId);
+
+        PetMatchManager matchManager = new PetMatchManager(this);
+        matchManager.findMatch(currentPet);
     }
 }
