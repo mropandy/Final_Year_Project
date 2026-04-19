@@ -78,10 +78,12 @@ dependencies {
     implementation(libs.tensorflow.lite.metadata)
     implementation("org.tensorflow:tensorflow-lite:2.13.0")
     implementation("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.tools.core)
+    implementation(libs.tensorflow.lite.gpu)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Cloudinary

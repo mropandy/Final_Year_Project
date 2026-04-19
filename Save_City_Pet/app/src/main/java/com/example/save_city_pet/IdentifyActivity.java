@@ -17,7 +17,11 @@ import com.example.save_city_pet.ml.PetBreedModel;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.common.FileUtil;
+import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.image.ops.ResizeOp;
+import org.tensorflow.lite.support.common.ops.NormalizeOp;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,21 +101,28 @@ public class IdentifyActivity extends AppCompatActivity {
             // 1. 初始化模型
             PetBreedModel model = PetBreedModel.newInstance(this);
 
-            // 2. 圖片預處理：手動縮放 Bitmap 到 224x224 (避開 ResizeOp 紅字問題)
+            // 2. 圖片預處理 (解決方案 B：手動縮放 + 僅歸一化)
+            // 💡 步驟 A：先用 Android 內建功能將圖片縮放至 224x224
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(selectedBitmap, 224, 224, true);
+
+            // 💡 步驟 B：建立只負責「歸一化」的 Processor (不使用 ResizeOp)
+            org.tensorflow.lite.support.image.ImageProcessor imageProcessor =
+                    new org.tensorflow.lite.support.image.ImageProcessor.Builder()
+                            .add(new org.tensorflow.lite.support.common.ops.NormalizeOp(0.0f, 255.0f))
+                            .build();
+
+            // 💡 步驟 C：載入已縮放的 Bitmap 並執行歸一化
             TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
             tensorImage.load(scaledBitmap);
+            tensorImage = imageProcessor.process(tensorImage);
 
             // 3. 執行推論
             PetBreedModel.Outputs outputs = model.process(tensorImage.getTensorBuffer());
 
-            // 💡 注意：如果此行報錯，請根據 PetBreedModel 提示改為 getProbabilityAsTensorBuffer()
+            // 4. 解析結果
             float[] confidenceArray = outputs.getOutputFeature0AsTensorBuffer().getFloatArray();
-
-            // 4. 載入標籤檔 (需放在 src/main/assets/labels.txt)
             List<String> labels = FileUtil.loadLabels(this, "labels.txt");
 
-            // 5. 尋找最高信心度結果
             int maxIndex = 0;
             float maxConfidence = 0;
             for (int i = 0; i < confidenceArray.length; i++) {
@@ -121,13 +132,19 @@ public class IdentifyActivity extends AppCompatActivity {
                 }
             }
 
-            // 6. 顯示結果 (包含翻譯)
+            // 5. 顯示結果
             if (maxIndex < labels.size()) {
                 String rawBreed = labels.get(maxIndex);
                 identifiedBreed = breedTranslation.getOrDefault(rawBreed, rawBreed);
 
-                tvResult.setText("辨識結果：" + identifiedBreed +
-                        "\n信心度：" + String.format("%.1f%%", maxConfidence * 100));
+                if (maxConfidence < 0.4f) {
+                    tvResult.setText("辨識結果：不確定 (可能是 " + identifiedBreed + "?)");
+                    tvResult.setTextColor(android.graphics.Color.GRAY);
+                } else {
+                    tvResult.setText("辨識結果：" + identifiedBreed +
+                            "\n信心度：" + String.format("%.1f%%", maxConfidence * 100));
+                    tvResult.setTextColor(android.graphics.Color.parseColor("#E53935"));
+                }
             }
 
             model.close();
@@ -137,17 +154,35 @@ public class IdentifyActivity extends AppCompatActivity {
         }
     }
 
+
+
     private void initTranslationMap() {
         breedTranslation = new HashMap<>();
-        // 💡 在此加入你 labels.txt 裡的品種對應，例如：
-        breedTranslation.put("Golden Retriever", "金毛尋回犬");
-        breedTranslation.put("Corgi", "威爾斯哥基");
-        breedTranslation.put("Poodle", "貴婦犬");
-        breedTranslation.put("Bulldog", "鬥牛犬");
-        breedTranslation.put("Samoyed", "薩摩耶犬");
-        breedTranslation.put("Shiba Inu", "柴犬");
-        // 你可以根據 Teachable Machine 的標籤持續增加
+        breedTranslation.put("0 約瑟爹利yorkshire_terrier", "約瑟爹利");
+        breedTranslation.put("1 巴哥pug", "巴哥 (Pug)");
+        breedTranslation.put("2 比高狗Beagle", "比高犬 (Beagle)");
+        breedTranslation.put("3 布偶貓ragdoll_cat", "布偶貓");
+        breedTranslation.put("4 老虎狗Bulldog", "老虎狗 (Bulldog)");
+        breedTranslation.put("5 孟買貓Bombay_cat", "孟買貓");
+        breedTranslation.put("6 拉布拉多Labrador", "拉布拉多");
+        breedTranslation.put("7 松鼠狗pomeranian", "松鼠狗");
+        breedTranslation.put("8 波斯貓Persian", "波斯貓");
+        breedTranslation.put("9 芝娃娃Chihuahua", "芝娃娃");
+        breedTranslation.put("10 金毛尋回犬Golden_Retriever", "金毛尋回犬");
+        breedTranslation.put("11 阿比西尼亞貓Abyssinian", "阿比西尼亞貓");
+        breedTranslation.put("12 哈士奇husky", "哈士奇 (Husky)");
+        breedTranslation.put("13 威爾斯柯基犬Welsh_Corgi", "威爾斯哥基");
+        breedTranslation.put("14 美國短毛貓 American_Shorthair", "美國短毛貓");
+        breedTranslation.put("15 拳師狗Boxer", "拳師狗 (Boxer)");
+        breedTranslation.put("16 柴犬shiba_inu", "柴犬 (Shiba Inu)");
+        breedTranslation.put("17 斯芬克斯貓sphynx", "斯芬克斯貓 (無毛貓)");
+        breedTranslation.put("18 德國狼狗German_Shepherd", "德國狼狗");
+        breedTranslation.put("19 緬因貓Maine_Coon", "緬因貓");
+        breedTranslation.put("20 暹羅貓siamese_cat", "暹羅貓");
+        breedTranslation.put("21 羅威納犬rottwiler", "羅威納犬");
+        breedTranslation.put("22 臘腸狗dachshund", "臘腸狗");
     }
+
     // 💡 這裡的參數名稱要叫 uri
     private Uri copyImageToInternalStorage(Uri uri) throws IOException {
         if (uri == null) return null;
