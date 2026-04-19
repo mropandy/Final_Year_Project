@@ -60,12 +60,32 @@
                         android:text="User Name" />
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/imgCart"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                <LinearLayout
+                    android:id="@+id/layoutCamera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
-                    android:src="@drawable/camera_icon" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:id="@+id/imgcamera"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/camera_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="AI分析"
+                        android:textColor="#E53935"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layoutReport"
@@ -89,7 +109,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="報告失蹤"
-                        android:textColor="#FF9800"
+                        android:textColor="#E53935"
                         android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>

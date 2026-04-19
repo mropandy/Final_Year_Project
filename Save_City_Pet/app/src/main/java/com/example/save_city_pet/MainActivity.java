@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         ImageView imgSettings = findViewById(R.id.imgSettings);
         EditText editTextSearch = findViewById(R.id.editTextSearch);
         ImageView imgProfile = findViewById(R.id.imgProfile);
-        ImageView imgCart = findViewById(R.id.imgCart);
-        imgCart.setOnClickListener(v -> {
+        ImageView imgCamera = findViewById(R.id.imgcamera);
+        imgCamera.setOnClickListener(v -> {
             // 直接跳轉到辨識頁面
             Intent intent = new Intent(MainActivity.this, IdentifyActivity.class);
             startActivity(intent);

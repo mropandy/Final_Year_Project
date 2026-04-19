@@ -81,11 +81,17 @@ public class ReportActivity extends AppCompatActivity {
         etDistrict.setAdapter(districtAdapter);
 
         String aiBreed = getIntent().getStringExtra("AI_BREED");
-        if (aiBreed != null && !aiBreed.isEmpty()) {
-            // 自動填入輸入框
-            etBreed.setText(aiBreed);
+        String imageUriStr = getIntent().getStringExtra("AI_IMAGE_URI");
+        if (imageUriStr != null) {
+            selectedImageUri = Uri.parse(imageUriStr);
 
-            // 提示使用者
+            // 使用 Glide 載入（推薦，更穩定）
+            com.bumptech.glide.Glide.with(this)
+                    .load(selectedImageUri)
+                    .into(imgReportPet);
+        }
+        if (aiBreed != null) {
+            etBreed.setText(aiBreed);
             Toast.makeText(this, "已自動填入辨識品種：" + aiBreed, Toast.LENGTH_SHORT).show();
         }
         // 5. 事件監聽

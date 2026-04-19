@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#111111"
-            android:text="帳號安全"
+            android:text="version 1.0.1"
             android:gravity="start|center_vertical"
             style="@style/Widget.AppCompat.Button.Borderless" />
 

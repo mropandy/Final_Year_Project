@@ -5,14 +5,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.privacysandbox.tools.core.proto.ByteString;
 
 
 import com.example.save_city_pet.ml.PetBreedModel;
@@ -21,6 +19,7 @@ import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.common.FileUtil;
 import org.tensorflow.lite.support.image.TensorImage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -33,20 +32,24 @@ public class IdentifyActivity extends AppCompatActivity {
     private Bitmap selectedBitmap;
     private String identifiedBreed = "";
     private Map<String, String> breedTranslation;
+    private Uri selectedImageUri;
 
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+
+                    // 這裡定義了一個局部的 uri
                     Uri uri = result.getData().getData();
+
                     try {
-                        // 取得選取圖片的原始 Bitmap
-                        selectedBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                        // 💡 將局部的 uri 傳入方法，並存入全域的 selectedImageUri
+                        selectedImageUri = copyImageToInternalStorage(uri);
+
+                        selectedBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
                         imgPreview.setImageBitmap(selectedBitmap);
-                        // 自動執行辨識
                         runInference();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(this, "讀取圖片失敗", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -60,6 +63,7 @@ public class IdentifyActivity extends AppCompatActivity {
 
         imgPreview = findViewById(R.id.imgPreview);
         tvResult = findViewById(R.id.tvResult);
+        imgPreview = findViewById(R.id.imgPreview);
         Button btnPick = findViewById(R.id.btnPickImage);
         Button btnNext = findViewById(R.id.btnGoReport);
 
@@ -69,16 +73,19 @@ public class IdentifyActivity extends AppCompatActivity {
             pickImageLauncher.launch(intent);
         });
 
+// 在 IdentifyActivity.java 的 btnNext 點擊事件中
         btnNext.setOnClickListener(v -> {
-            if (identifiedBreed.isEmpty()) {
-                Toast.makeText(this, "請先辨識寵物", Toast.LENGTH_SHORT).show();
+            if (identifiedBreed.isEmpty() || selectedImageUri == null) {
+                Toast.makeText(this, "請先選取並辨識寵物照片", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(this, ReportActivity.class);
+            Intent intent = new Intent(IdentifyActivity.this, ReportActivity.class);
             intent.putExtra("AI_BREED", identifiedBreed);
+            intent.putExtra("AI_IMAGE_URI", selectedImageUri.toString());
             startActivity(intent);
             finish();
         });
+
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
@@ -141,4 +148,22 @@ public class IdentifyActivity extends AppCompatActivity {
         breedTranslation.put("Shiba Inu", "柴犬");
         // 你可以根據 Teachable Machine 的標籤持續增加
     }
+    // 💡 這裡的參數名稱要叫 uri
+    private Uri copyImageToInternalStorage(Uri uri) throws IOException {
+        if (uri == null) return null;
+
+        java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+        File file = new File(getFilesDir(), "temp_ai_image.jpg");
+        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(file);
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        outputStream.close();
+        inputStream.close();
+        return Uri.fromFile(file);
+    }
+
 }
