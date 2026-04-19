@@ -183,14 +183,14 @@ public class IdentifyActivity extends AppCompatActivity {
         breedTranslation.put("22 臘腸狗dachshund", "臘腸狗");
     }
 
-    // 💡 這裡的參數名稱要叫 uri
     private Uri copyImageToInternalStorage(Uri uri) throws IOException {
-        if (uri == null) return null;
-
         java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
-        File file = new File(getFilesDir(), "temp_ai_image.jpg");
-        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(file);
 
+        // 💡 加上時間戳，確保每次生成的檔名都不同，避免緩存問題
+        String fileName = "ai_pet_" + System.currentTimeMillis() + ".jpg";
+        File file = new File(getFilesDir(), fileName);
+
+        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(file);
         byte[] buffer = new byte[1024];
         int bytesRead;
         while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -200,5 +200,4 @@ public class IdentifyActivity extends AppCompatActivity {
         inputStream.close();
         return Uri.fromFile(file);
     }
-
 }

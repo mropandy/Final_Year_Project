@@ -72,7 +72,7 @@ public class DetailActivity extends AppCompatActivity {
                     if (phoneNumber != null && !phoneNumber.isEmpty()) {
                         String rawMessage = "你好，我想查詢關於案件 #" + pet.getCaseID() + " (" + pet.getTitle() + ") 的資訊。";
                         String urlEncodedText = Uri.encode(rawMessage);
-                        String url = "https://wa.me" + phoneNumber + "?text=" + urlEncodedText;
+                        String url = "https://wa.me/" + phoneNumber + "?text=" + urlEncodedText;
 
                         try {
                             Intent intent = new Intent(Intent.ACTION_VIEW);

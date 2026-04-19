@@ -85,9 +85,10 @@ public class ReportActivity extends AppCompatActivity {
         if (imageUriStr != null) {
             selectedImageUri = Uri.parse(imageUriStr);
 
-            // 使用 Glide 載入（推薦，更穩定）
             com.bumptech.glide.Glide.with(this)
                     .load(selectedImageUri)
+                    .skipMemoryCache(true) // 💡 1. 禁用記憶體快取
+                    .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE) // 💡 2. 禁用硬碟快取
                     .into(imgReportPet);
         }
         if (aiBreed != null) {
