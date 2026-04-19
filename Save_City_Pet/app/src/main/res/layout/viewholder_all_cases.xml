@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 💡 補上 ID 用於整行點擊跳轉詳細頁 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layoutCaseItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,7 +10,7 @@
     android:background="@drawable/stroke_bg"
     android:gravity="center_vertical">
 
-    <!-- 寵物圖片 (建議在 drawable 加個預設圖 placeholder) -->
+    <!-- 寵物圖片 -->
     <ImageView
         android:id="@+id/petPic"
         android:layout_width="80dp"
@@ -33,7 +33,7 @@
             android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="@android:color/black"
-            android:text="寵物名字" /> <!-- 💡 補上預設文字方便預覽 -->
+            android:text="寵物名字" />
 
         <TextView
             android:id="@+id/petInfo"
@@ -44,7 +44,19 @@
             android:textColor="#888888" />
     </LinearLayout>
 
-    <!-- 最右邊的「發布」組合按鈕 -->
+    <!-- 💡 新增：管理員刪除按鈕 (預設隱藏) -->
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_delete"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Admin Delete Button"
+        app:tint="#FF0000" />
+
+    <!-- 最右邊的「發布」組合按鈕 (私人手冊用) -->
     <LinearLayout
         android:id="@+id/btnPublish"
         android:layout_width="wrap_content"
@@ -56,15 +68,12 @@
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless">
 
-        <!-- 小飛機圖示 -->
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:scaleType="fitCenter"
-            android:src="@android:drawable/ic_menu_send"
-            android:contentDescription="Publish Button Icon" />
+            android:src="@android:drawable/ic_menu_send" />
 
-        <!-- 顯示「發布」文字 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,7 +82,23 @@
             android:textColor="#FF5050"
             android:textStyle="bold"
             android:layout_marginTop="2dp" />
-
     </LinearLayout>
+    <!-- 💡 在佈局的最底層加入這個浮水印標籤 -->
+    <TextView
+        android:id="@+id/tvFoundBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/green_rounded_badge"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:text="SUCCESS 已找回"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" /> <!-- 預設隱藏 -->
+
 
 </LinearLayout>

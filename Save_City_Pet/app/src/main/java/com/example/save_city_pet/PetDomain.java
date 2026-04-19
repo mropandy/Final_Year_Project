@@ -14,6 +14,7 @@ public class PetDomain implements Serializable {
     private String categoryId;  // 屬於哪個分類 (missing_cat_01)
     private String phone;
     private String caseID;
+    private String status;
 
     public PetDomain() {
     }
@@ -102,6 +103,14 @@ public class PetDomain implements Serializable {
     @Override
     public String toString() {
         return "PetDomain{" + "title='" + title + '\'' + ", caseID='" + caseID + '\'' + '}';
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 
