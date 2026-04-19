@@ -42,7 +42,8 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true // 必須開啟，Java 才抓得到 BuildConfig
+        buildConfig = true
+        mlModelBinding = true// 必須開啟，Java 才抓得到 BuildConfig
     }
 
     buildTypes {
@@ -72,8 +73,15 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
 
+    // TensorFlow Lite
+    implementation(libs.tensorflow.lite.support)
+    implementation(libs.tensorflow.lite.metadata)
+    implementation("org.tensorflow:tensorflow-lite:2.13.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4")
+
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.tools.core)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Cloudinary

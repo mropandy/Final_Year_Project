@@ -54,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
         ImageView imgSettings = findViewById(R.id.imgSettings);
         EditText editTextSearch = findViewById(R.id.editTextSearch);
         ImageView imgProfile = findViewById(R.id.imgProfile);
+        ImageView imgCart = findViewById(R.id.imgCart);
+        imgCart.setOnClickListener(v -> {
+            // 直接跳轉到辨識頁面
+            Intent intent = new Intent(MainActivity.this, IdentifyActivity.class);
+            startActivity(intent);
+        });
 
         // 💡 1. 移除了重複實例化 searchManager 的程式碼
 // 在 MainActivity 的 onCreate 中，補上第三個參數（這需要您在 activity_main.xml 中放一個 TextView 顯示找不到結果）

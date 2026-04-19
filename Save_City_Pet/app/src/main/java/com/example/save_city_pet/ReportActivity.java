@@ -66,6 +66,7 @@ public class ReportActivity extends AppCompatActivity {
         rgGender = findViewById(R.id.rgPetGender);
         spinnerCategory = findViewById(R.id.spinnerCategory);
         spinnerPhoneCode = findViewById(R.id.spinnerPhoneCode);
+        etBreed = findViewById(R.id.etPetBreed);
 
         // 3. 設定 下拉選單 (Spinner)
         ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, catTitles);
@@ -79,6 +80,14 @@ public class ReportActivity extends AppCompatActivity {
         ArrayAdapter<String> districtAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, districts);
         etDistrict.setAdapter(districtAdapter);
 
+        String aiBreed = getIntent().getStringExtra("AI_BREED");
+        if (aiBreed != null && !aiBreed.isEmpty()) {
+            // 自動填入輸入框
+            etBreed.setText(aiBreed);
+
+            // 提示使用者
+            Toast.makeText(this, "已自動填入辨識品種：" + aiBreed, Toast.LENGTH_SHORT).show();
+        }
         // 5. 事件監聽
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 

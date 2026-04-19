@@ -28,6 +28,8 @@
         <activity android:name=".DetailActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".ReportActivity" />
+        <activity android:name=".IdentifyActivity" />
+
 
         <activity
             android:name=".FirstActivity"

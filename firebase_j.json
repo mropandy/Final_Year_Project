@@ -23,7 +23,7 @@
       "age": 3,
       "district": "Tuen Mun",
       "gender": "Male",
-      "breed": "Abyssinian",
+      "breed": "阿比西尼亞貓",
       "description": "於屯門走失"
     },"pet_02": {
       "title": "大黃",
@@ -34,7 +34,7 @@
       "age": 2,
       "district": "Yuen Long",
       "gender": "Male",
-      "breed": "Golden Retriever",
+      "breed": "金毛尋回犬",
       "description": "性格溫順，在元朗公園附近發現，身上帶有藍色項圈。",
       "status": "撿到"
     },
