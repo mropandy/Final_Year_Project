@@ -60,6 +60,8 @@
           "name": "多比",
           "breed": "Welsh Corgi",
           "age": 2,
+          "gender": "Female",
+          "district": "Shatin",
           "picUrl": "/data/user/0/com.example.save_city_pet/files/my_pets/pet_1776286315067.jpg",
           "notes": "這是我的私人寵物，別人看不到"
         }

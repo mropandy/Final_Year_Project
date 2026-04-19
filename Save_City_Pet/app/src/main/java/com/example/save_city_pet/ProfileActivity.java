@@ -3,13 +3,8 @@ package com.example.save_city_pet;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -133,21 +128,57 @@ public class ProfileActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 40, 50, 10);
 
+        // 名字輸入
         final EditText inputName = new EditText(this);
         inputName.setHint("寵物名字");
         layout.addView(inputName);
 
+        // 品種輸入
         final EditText inputBreed = new EditText(this);
         inputBreed.setHint("品種 (例如：哥基)");
         layout.addView(inputBreed);
 
+        // 年齡輸入
         final EditText inputAge = new EditText(this);
         inputAge.setHint("年齡");
         inputAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(inputAge);
 
+        // --- 新增：性別選擇 (RadioButtons) ---
+        TextView genderLabel = new TextView(this);
+        genderLabel.setText("性別：");
+        genderLabel.setPadding(0, 20, 0, 0);
+        layout.addView(genderLabel);
+
+        final RadioGroup genderGroup = new RadioGroup(this);
+        genderGroup.setOrientation(RadioGroup.HORIZONTAL);
+        RadioButton rbMale = new RadioButton(this);
+        rbMale.setText("公");
+        rbMale.setId(View.generateViewId());
+        RadioButton rbFemale = new RadioButton(this);
+        rbFemale.setText("母");
+        rbFemale.setId(View.generateViewId());
+        genderGroup.addView(rbMale);
+        genderGroup.addView(rbFemale);
+        rbMale.setChecked(true); // 預設選擇
+        layout.addView(genderGroup);
+
+        // --- 新增：地區選擇 (Spinner) ---
+        TextView districtLabel = new TextView(this);
+        districtLabel.setText("地區：");
+        districtLabel.setPadding(0, 20, 0, 0);
+        layout.addView(districtLabel);
+
+        final Spinner districtSpinner = new Spinner(this);
+        String[] districts = new String[]{"Tuen Mun", "Sha Tin", "Mong Kok", "Kowloon City", "Central and Western", "Wan Chai", "Yau Tsim Mong", "Southern", "Tai Po", "Kwai Tsing", "Sai Kung", "Northern", "Yuen Long", "Tsuen Wan", "Islands", "Kwun Tong", "Wong Tai Sin", "Sham Shui Po"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, districts);
+        districtSpinner.setAdapter(adapter);
+        layout.addView(districtSpinner);
+
+        // 照片按鈕
         final Button btnPick = new Button(this);
         btnPick.setText("選取寵物照片");
+        btnPick.setPadding(0, 30, 0, 0);
         btnPick.setOnClickListener(v -> openGallery());
         layout.addView(btnPick);
 
@@ -159,9 +190,14 @@ public class ProfileActivity extends AppCompatActivity {
             String ageStr = inputAge.getText().toString();
             int age = ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr);
 
+            // 獲取選中的性別與地區
+            String gender = ((RadioButton) genderGroup.findViewById(genderGroup.getCheckedRadioButtonId())).getText().toString();
+            String district = districtSpinner.getSelectedItem().toString();
+
             if (imageUri != null) {
-                uploadManager.savePetLocally(name, breed, age, imageUri);
-                imageUri = null; // 上傳後重置
+                // 建議修改 uploadManager 的方法以接收 gender 和 district
+                uploadManager.savePetLocally(name, breed, age, gender, district, imageUri);
+                imageUri = null;
             } else {
                 Toast.makeText(this, "請先選擇照片", Toast.LENGTH_SHORT).show();
             }
@@ -170,6 +206,7 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setNegativeButton("取消", null);
         builder.show();
     }
+
 
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);

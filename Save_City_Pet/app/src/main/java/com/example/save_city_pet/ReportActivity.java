@@ -148,6 +148,8 @@ public class ReportActivity extends AppCompatActivity {
             publicPet.put("description", desc);
             publicPet.put("picUrl", picUrl);
             publicPet.put("categoryId", "04_missing_dog");
+            publicPet.put("gender", "Unknown");
+
 
             itemsRef.child(newCaseKey).setValue(publicPet).addOnSuccessListener(aVoid -> {
                 Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show();

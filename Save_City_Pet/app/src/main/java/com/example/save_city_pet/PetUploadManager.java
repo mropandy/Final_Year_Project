@@ -19,7 +19,7 @@ public class PetUploadManager {
         this.context = context;
     }
 
-    public void savePetLocally(String name, String breed, int age, Uri imageUri) {
+    public void savePetLocally(String name, String breed, int age, String gender, String district, Uri imageUri) {
         String uid = FirebaseAuth.getInstance().getUid();
         if (uid == null || imageUri == null) return;
 
@@ -51,14 +51,14 @@ public class PetUploadManager {
             String localPath = localFile.getAbsolutePath();
 
             // 存入 Firebase
-            saveToFirebase(uid, name, breed, age, localPath);
+            saveToFirebase(uid, name, breed, age, localPath,gender,district);
 
         } catch (Exception e) {
             Toast.makeText(context, "儲存失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void saveToFirebase(String uid, String name, String breed, int age, String localPath) {
+    private void saveToFirebase(String uid, String name, String breed, int age, String localPath, String gender, String district) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users")
                 .child(uid).child("myPets");
 
@@ -67,6 +67,8 @@ public class PetUploadManager {
         newPet.setBreed(breed);
         newPet.setAge(age);
         newPet.setPicUrl(localPath);
+        newPet.setGender(gender);
+        newPet.setDistrict(district);
 
         ref.push().setValue(newPet).addOnSuccessListener(aVoid ->
                 Toast.makeText(context, "寵物已存至本地", Toast.LENGTH_SHORT).show());

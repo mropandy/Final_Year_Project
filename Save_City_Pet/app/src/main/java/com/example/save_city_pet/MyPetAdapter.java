@@ -159,23 +159,18 @@ public class MyPetAdapter extends RecyclerView.Adapter<MyPetAdapter.ViewHolder> 
                     publicPet.put("breed", pet.getBreed());
                     publicPet.put("age", pet.getAge());
                     publicPet.put("categoryId", categoryId);
-                    publicPet.put("phone", userPhone); // 💡 將撈出來的電話寫入
+                    publicPet.put("phone", userPhone);
+                    publicPet.put("gender", pet.getGender());
+                    publicPet.put("district", pet.getDistrict());
 
                     // 💡 4. 解決破圖問題：填入對應的圖標網址，代替假網址
-                    if (categoryId.equals("03_missing_cat")) {
-                        publicPet.put("picUrl", "https://cloudinary.com");
-                    } else {
-                        publicPet.put("picUrl", "https://cloudinary.com");
-                    }
+                    publicPet.put("picUrl", pet.getPicUrl());
 
-                    publicPet.put("description", "這是一筆從個人手冊發布的通報。備註：" + (pet.getNotes() != null ? pet.getNotes() : "無"));
+                    publicPet.put("description", "Debug 模式：本地路徑發布。備註：" + (pet.getNotes() != null ? pet.getNotes() : "無"));
 
                     itemsRef.child(newCaseKey).setValue(publicPet)
                             .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(context, "已成功發布至公開平臺！", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(context, "發布失敗：" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Debug：已發布（本地路徑）", Toast.LENGTH_SHORT).show();
                             });
                 }
             }
