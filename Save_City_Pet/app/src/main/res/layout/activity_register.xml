@@ -3,71 +3,105 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@android:color/white">
 
-    <!-- 1. 頂部區域：放置左上角按鈕 -->
-
-    <!-- 2. 中間區域：註冊表單 -->
+    <!-- 頂部返回按鈕 -->
     <ImageButton
         android:id="@+id/btnArrow"
         android:layout_width="@dimen/back_button_size"
         android:layout_height="@dimen/back_button_size"
-        android:layout_gravity="start"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_margin="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="返回"
-        android:padding="5dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_arrow_back" />
+        android:src="@drawable/ic_arrow_back"
+        android:padding="12dp"
+        android:scaleType="fitCenter" />
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:gravity="center">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="註冊新帳號"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="40dp" />
+            android:orientation="vertical"
+            android:paddingHorizontal="40dp"
+            android:paddingBottom="40dp"
+            android:gravity="center_horizontal">
 
-        <EditText
-            android:id="@+id/regEmail"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="電子郵件 (Email)"
-            android:inputType="textEmailAddress"
-            android:paddingStart="10dp"
-            android:background="@android:drawable/editbox_background" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="註冊新帳號"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#E53935"
+                android:layout_marginBottom="40dp" />
 
-        <EditText
-            android:id="@+id/regPassword"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="密碼 (至少6位數)"
-            android:inputType="textPassword"
-            android:layout_marginTop="15dp"
-            android:paddingStart="10dp"
-            android:background="@android:drawable/editbox_background" />
+            <!-- 用戶名稱 -->
+            <EditText
+                android:id="@+id/regUsername"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="用戶名稱 (Username)"
+                android:inputType="textPersonName"
+                android:background="@drawable/stroke_bg"
+                android:paddingHorizontal="16dp" />
 
-        <Button
-            android:id="@+id/btnDoRegister"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="立即註冊"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#2196F3"
-            android:layout_marginTop="30dp" />
+            <!-- 聯絡電話 -->
+            <EditText
+                android:id="@+id/regPhone"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:hint="聯絡電話 (如 85212345678)"
+                android:inputType="phone"
+                android:background="@drawable/stroke_bg"
+                android:paddingHorizontal="16dp" />
 
-    </LinearLayout>
+            <!-- 電子郵件 -->
+            <EditText
+                android:id="@+id/regEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:hint="電子郵件 (Email)"
+                android:inputType="textEmailAddress"
+                android:background="@drawable/stroke_bg"
+                android:paddingHorizontal="16dp" />
+
+            <!-- 密碼 -->
+            <EditText
+                android:id="@+id/regPassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:hint="密碼 (至少6位數)"
+                android:inputType="textPassword"
+                android:background="@drawable/stroke_bg"
+                android:paddingHorizontal="16dp" />
+
+            <!-- 立即註冊按鈕 -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDoRegister"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/red_rounded_btn"
+                android:text="立即註冊"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textAllCaps="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="點擊註冊代表您同意服務條款"
+                android:textColor="#999999"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

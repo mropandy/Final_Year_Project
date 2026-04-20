@@ -22,22 +22,24 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // 初始化 Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        // 綁定 UI 元件
         EditText edEmail = findViewById(R.id.regEmail);
         EditText edPassword = findViewById(R.id.regPassword);
+        EditText edUsername = findViewById(R.id.regUsername);
+        EditText edPhone = findViewById(R.id.regPhone);
         Button btnDoRegister = findViewById(R.id.btnDoRegister);
         ImageButton btnArrow = findViewById(R.id.btnArrow);
 
-        // 1. 執行註冊邏輯
         btnDoRegister.setOnClickListener(v -> {
             String email = edEmail.getText().toString().trim();
             String password = edPassword.getText().toString().trim();
+            String username = edUsername.getText().toString().trim();
+            String phone = edPhone.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "請輸入電子郵件和密碼", Toast.LENGTH_SHORT).show();
+            // 1. 完整性檢查
+            if (email.isEmpty() || password.isEmpty() || username.isEmpty() || phone.isEmpty()) {
+                Toast.makeText(this, "請填寫完整資訊", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -46,26 +48,25 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            // 💡 體驗優化：點擊後立即禁用按鈕，防止狂點造成重複請求
             btnDoRegister.setEnabled(false);
 
-            // Firebase 註冊指令
+            // 2. Firebase 註冊
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            // 💡 關鍵修正：註冊成功後，在 Database 同步建立 Users 節點
                             String uid = mAuth.getCurrentUser().getUid();
                             DatabaseReference userRef = FirebaseDatabase.getInstance()
                                     .getReference("Users").child(uid);
 
+                            // 💡 修正：將輸入的值放入 HashMap，不再寫死
                             HashMap<String, Object> userData = new HashMap<>();
-                            userData.put("username", "新用戶"); // 預設名稱
-                            userData.put("phone", "待補充");     // 預設電話
+                            userData.put("username", username);
+                            userData.put("phone", phone);
 
                             userRef.setValue(userData).addOnCompleteListener(dbTask -> {
                                 if (dbTask.isSuccessful()) {
                                     Toast.makeText(this, "註冊成功！請登入", Toast.LENGTH_SHORT).show();
-                                    finish(); // 雙邊都成功，關閉此頁
+                                    finish();
                                 } else {
                                     btnDoRegister.setEnabled(true);
                                     Toast.makeText(this, "建立資料庫失敗: " + dbTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -73,15 +74,12 @@ public class RegisterActivity extends AppCompatActivity {
                             });
 
                         } else {
-                            btnDoRegister.setEnabled(true); // 失敗時重新啟用
+                            btnDoRegister.setEnabled(true);
                             Toast.makeText(this, "註冊失敗: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
         });
 
-        // 2. 自定義箭頭點擊
-        btnArrow.setOnClickListener(v -> {
-            finish();
-        });
+        btnArrow.setOnClickListener(v -> finish());
     }
 }
