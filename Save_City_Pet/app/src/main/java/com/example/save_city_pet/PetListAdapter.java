@@ -9,6 +9,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.ViewHolder> {
@@ -41,7 +43,6 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.ViewHold
         if (holder.btnPublish != null) {
             holder.btnPublish.setVisibility(View.GONE);
         }
-        // 在 PetListAdapter 的 onBindViewHolder 裡面
         if ("Found".equals(pet.getStatus())) {
             holder.tvFoundBadge.setVisibility(View.VISIBLE); // 💡 顯示綠色標籤
             holder.pic.setAlpha(0.6f); // 圖片變暗一點，讓綠色更明顯
@@ -81,6 +82,18 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.ViewHold
         } else {
             holder.tvFoundBadge.setVisibility(View.GONE);
             holder.pic.setAlpha(1.0f);
+        }
+        // 在 MyPetAdapter.java 的 onBindViewHolder 內
+        String picUrl = pet.getPicUrl();
+        if (picUrl != null) {
+            if (picUrl.startsWith("http")) {
+                // 💡 雲端網址 (移交來的)
+                Glide.with(holder.itemView.getContext()).load(picUrl).into(holder.pic);
+            } else {
+                // 💡 本地路徑 (自己加的)
+                File file = new File(picUrl);
+                Glide.with(holder.itemView.getContext()).load(file).into(holder.pic);
+            }
         }
     }
 

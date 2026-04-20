@@ -48,7 +48,8 @@ public class ReportActivity extends AppCompatActivity {
             config.put("cloud_name", BuildConfig.CLOUDINARY_CLOUD_NAME);
             config.put("secure", true);
             MediaManager.init(this, config);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
         imgReportPet = findViewById(R.id.imgReportPet);
         etName = findViewById(R.id.etPetName);
@@ -69,7 +70,7 @@ public class ReportActivity extends AppCompatActivity {
         ArrayAdapter<String> phoneAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, phoneCodes);
         spinnerPhoneCode.setAdapter(phoneAdapter);
 
-        String[] districts = new String[]{"Tuen Mun", "Sha Tin", "Mong Kok", "Kowloon City", "Central and Western" , "Wan Chai", "Yau Tsim Mong","Southern","Tai Po","Kwai Tsing","Sai Kung","Northern", "Yuen Long","Tsuen Wan","Islands","Kwun Tong","Wong Tai Sin","Sham Shui Po"};
+        String[] districts = new String[]{"Tuen Mun", "Sha Tin", "Mong Kok", "Kowloon City", "Central and Western", "Wan Chai", "Yau Tsim Mong", "Southern", "Tai Po", "Kwai Tsing", "Sai Kung", "Northern", "Yuen Long", "Tsuen Wan", "Islands", "Kwun Tong", "Wong Tai Sin", "Sham Shui Po"};
         ArrayAdapter<String> districtAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, districts);
         etDistrict.setAdapter(districtAdapter);
 
@@ -146,31 +147,40 @@ public class ReportActivity extends AppCompatActivity {
                 .unsigned("save_city_pet_presetName") // 💡 確保此 Preset Name 正確
                 .callback(new UploadCallback() {
                     @Override
-                    public void onStart(String requestId) {}
+                    public void onStart(String requestId) {
+                    }
+
                     @Override
-                    public void onProgress(String requestId, long bytes, long totalBytes) {}
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+                    }
+
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
                         String imageUrl = (String) resultData.get("secure_url");
                         // 呼叫上傳，注意參數順序需與定義一致
                         uploadToPublicItems(newCaseKey, finalName, breed, district, fullPhone, desc, imageUrl, gender, categoryId, age);
                     }
+
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
                         btnSubmit.setEnabled(true);
                         Toast.makeText(ReportActivity.this, "圖片上傳失敗: " + error.getDescription(), Toast.LENGTH_SHORT).show();
                     }
+
                     @Override
-                    public void onReschedule(String requestId, ErrorInfo error) {}
+                    public void onReschedule(String requestId, ErrorInfo error) {
+                    }
                 }).dispatch();
     }
 
     private void uploadToPublicItems(String newCaseKey, String name, String breed, String district,
                                      String phone, String desc, String picUrl,
                                      String gender, String categoryId, int age) {
-        DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("Items");
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference itemsRef = database.child("Items");
 
         if (newCaseKey != null) {
+            // 1. 準備公開案件數據 (PetDomain 格式)
             HashMap<String, Object> publicPet = new HashMap<>();
             publicPet.put("caseID", newCaseKey);
             publicPet.put("title", name);
@@ -183,38 +193,49 @@ public class ReportActivity extends AppCompatActivity {
             publicPet.put("gender", gender);
             publicPet.put("age", age);
 
+            // 2. 寫入公開 Items 節點
             itemsRef.child(newCaseKey).setValue(publicPet).addOnSuccessListener(aVoid -> {
                 if (isFinishing() || isDestroyed()) return;
 
-                Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show();
+                // 3. 彈出移交管理員對話框
                 new AlertDialog.Builder(this)
                         .setTitle("交由管理員處理？")
-                        .setMessage("您是否需要將此寵物交由 IVE (TM) 管理員接手照顧？\n\n若選擇「是」，聯絡電話將更改為管理員電話。")
+                        .setMessage("您是否需要將此寵物交由 IVE (TM) 管理員接手照顧？\n\n選擇「是」後，寵物將出現在管理員的私人手冊中。")
                         .setCancelable(false)
                         .setPositiveButton("是，交給管理員", (dialog, which) -> {
-                            // 💡 2. 更新 Firebase 中的電話為 IVE (TM) 的電話
+
+                            String adminUid = "kjofM1zN8QfW1wuDUHSxCGbWWg33";
                             String adminPhone = "85259246707";
-                            itemsRef.child(newCaseKey).child("phone").setValue(adminPhone)
+
+                            // A. 更新 Items 裡的電話為管理員電話
+                            itemsRef.child(newCaseKey).child("phone").setValue(adminPhone);
+
+                            // B. 準備 Admin 的私人手冊數據 (MyPetDomain 格式)
+                            HashMap<String, Object> adminPetData = new HashMap<>();
+                            adminPetData.put("name", name); // 💡 注意：私人手冊用 name
+                            adminPetData.put("breed", breed);
+                            adminPetData.put("age", age);
+                            adminPetData.put("gender", gender);
+                            adminPetData.put("district", district);
+                            adminPetData.put("picUrl", picUrl);
+                            adminPetData.put("notes", "由用戶移交，原始編號: #" + newCaseKey);
+
+                            // C. 寫入 Users/kjofM1z.../myPets 節點
+                            database.child("Users").child(adminUid).child("myPets").child(newCaseKey)
+                                    .setValue(adminPetData)
                                     .addOnSuccessListener(unused -> {
-                                        Toast.makeText(this, "已交由 IVE (TM) 接手", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(this, "發布成功並已移交管理員", Toast.LENGTH_SHORT).show();
                                         startMatchingProcess(newCaseKey, breed, district, gender, categoryId);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "移交失敗，但案件已發布", Toast.LENGTH_SHORT).show();
                                     });
                         })
                         .setNegativeButton("否，我自己聯絡", (dialog, which) -> {
+                            Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show();
                             startMatchingProcess(newCaseKey, breed, district, gender, categoryId);
                         })
                         .show();
-
-                PetDomain currentPet = new PetDomain();
-                currentPet.setCaseID(newCaseKey);
-                currentPet.setBreed(breed);
-                currentPet.setDistrict(district);
-                currentPet.setGender(gender);
-                currentPet.setCategoryId(categoryId);
-
-                // 💡 確保傳入正確的 Context
-                PetMatchManager matchManager = new PetMatchManager(this);
-                matchManager.findMatch(currentPet);
             });
         }
     }

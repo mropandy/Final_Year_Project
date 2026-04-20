@@ -10,6 +10,8 @@ public class MyPetDomain implements Serializable {
     private String name;    // 💡 注意：與 Items 的 title 不同，對應 JSON 內的 name
     private String breed;
     private int age;
+    private String gender;
+    private String district;
     private String picUrl;  // 存放本地路徑
     private String notes;   // 備註
     private String key;
@@ -38,10 +40,6 @@ public class MyPetDomain implements Serializable {
         this.district = district;
     }
 
-    private String gender;
-    private String district;  // 💡 存放 Firebase 節點的 Key
-
-    // Firebase 必需的空建構子
     public MyPetDomain() {
     }
 
