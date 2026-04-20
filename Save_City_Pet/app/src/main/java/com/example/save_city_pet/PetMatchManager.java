@@ -22,8 +22,6 @@ public class PetMatchManager {
         String district = newPet.getDistrict();
         String gender = newPet.getGender();
         String categoryId = newPet.getCategoryId();
-
-        // 💡 1. 修正分類交叉比對邏輯
         // 撿到 (01, 02) -> 找 尋找 (03, 04)
         // 尋找 (03, 04) -> 找 撿到 (01, 02)
         String targetPrefix = (categoryId.startsWith("01") || categoryId.startsWith("02")) ? "0" : "0";

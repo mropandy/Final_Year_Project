@@ -101,25 +101,18 @@ public class IdentifyActivity extends AppCompatActivity {
             // 1. 初始化模型
             PetBreedModel model = PetBreedModel.newInstance(this);
 
-            // 2. 圖片預處理 (解決方案 B：手動縮放 + 僅歸一化)
-            // 💡 步驟 A：先用 Android 內建功能將圖片縮放至 224x224
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(selectedBitmap, 224, 224, true);
-
-            // 💡 步驟 B：建立只負責「歸一化」的 Processor (不使用 ResizeOp)
             org.tensorflow.lite.support.image.ImageProcessor imageProcessor =
                     new org.tensorflow.lite.support.image.ImageProcessor.Builder()
                             .add(new org.tensorflow.lite.support.common.ops.NormalizeOp(0.0f, 255.0f))
                             .build();
 
-            // 💡 步驟 C：載入已縮放的 Bitmap 並執行歸一化
             TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
             tensorImage.load(scaledBitmap);
             tensorImage = imageProcessor.process(tensorImage);
 
-            // 3. 執行推論
             PetBreedModel.Outputs outputs = model.process(tensorImage.getTensorBuffer());
 
-            // 4. 解析結果
             float[] confidenceArray = outputs.getOutputFeature0AsTensorBuffer().getFloatArray();
             List<String> labels = FileUtil.loadLabels(this, "labels.txt");
 
@@ -132,7 +125,6 @@ public class IdentifyActivity extends AppCompatActivity {
                 }
             }
 
-            // 5. 顯示結果
             if (maxIndex < labels.size()) {
                 String rawBreed = labels.get(maxIndex);
                 identifiedBreed = breedTranslation.getOrDefault(rawBreed, rawBreed);
